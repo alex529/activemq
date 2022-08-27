@@ -15,5 +15,5 @@ services:
   publisher:
     image: imageName
 
-  subscriver:
+  subscrbier:
     image: imageName
