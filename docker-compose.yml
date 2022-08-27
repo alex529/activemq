@@ -1,0 +1,19 @@
+version: '2'
+services:
+  artemis:
+    image: quay.io/artemiscloud/activemq-artemis-broker
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+      - "5672:5672"
+    environment:
+      AMQ_USER: quarkus
+      AMQ_PASSWORD: quarkus
+    networks:
+      - amqp-quickstart-network
+
+  publisher:
+    image: imageName
+
+  subscriver:
+    image: imageName
