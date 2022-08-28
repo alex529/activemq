@@ -9,15 +9,15 @@ import (
 
 func MakeConfig[T any](filePath string) (T, error) {
 	var cfg T
-	if err := readFile(&cfg); err != nil {
+	if err := readFile(filePath, &cfg); err != nil {
 		return cfg, err
 	}
 
 	return cfg, envconfig.Process("", &cfg)
 }
 
-func readFile[T any](cfg *T) error {
-	f, err := os.Open("config.yml")
+func readFile[T any](path string, cfg *T) error {
+	f, err := os.Open(path)
 	if err != nil {
 		return err
 	}
