@@ -1,5 +1,21 @@
 package utils
 
-type Message struct {
-	Version string `json:"version"`
+import "github.com/alex529/activemq/schema"
+
+type MessageFactory[T any] struct {
+	version string
+	msg     T
+}
+
+func MakeMessageFactory[T any](version string) MessageFactory[T] {
+	return MessageFactory[T]{
+		version: version,
+	}
+}
+
+func (p MessageFactory[T]) Make(payload T) schema.Message[T] {
+	return schema.Message[T]{
+		Version: p.version,
+		Payload: payload,
+	}
 }
