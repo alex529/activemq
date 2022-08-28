@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"errors"
+	"fmt"
 	"os"
+	"reflect"
 
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/yaml.v2"
@@ -12,8 +15,11 @@ func MakeConfig[T any](filePath string) (T, error) {
 	if err := readFile(filePath, &cfg); err != nil {
 		return cfg, err
 	}
+	if err := envconfig.Process("", &cfg); err != nil {
+		return cfg, err
+	}
 
-	return cfg, envconfig.Process("", &cfg)
+	return cfg, areAllInitialized(cfg)
 }
 
 func readFile[T any](path string, cfg *T) error {
@@ -24,4 +30,37 @@ func readFile[T any](path string, cfg *T) error {
 	defer f.Close()
 
 	return yaml.NewDecoder(f).Decode(cfg)
+}
+
+func areAllInitialized(cfg interface{}) error {
+	reflectType := reflect.TypeOf(cfg)
+	reflectValue := reflect.ValueOf(cfg)
+
+	aggErr := NewAggregateError()
+	for i := 0; i < reflectType.NumField(); i++ {
+		typeName := reflectType.Field(i).Name
+		valueValue := reflectValue.Field(i).Interface()
+
+		switch reflectValue.Field(i).Kind() {
+		case reflect.String:
+			if valueValue == "" {
+				aggErr.Add(fmt.Errorf("%s was not set", typeName))
+			}
+		case reflect.Struct:
+			aggErr.Add(areAllInitialized(valueValue))
+		case reflect.Slice:
+			if reflect.TypeOf(valueValue).Elem().Kind() != reflect.String {
+				aggErr.Add(errors.New("Only arrays of strings are allowed"))
+				break
+			}
+			array := valueValue.([]string)
+			if len(array) == 0 || array[0] == "" {
+				aggErr.Add(fmt.Errorf("%s was not set", typeName))
+			}
+		default:
+			return errors.New("Only structs/arrays of strings are allowed")
+		}
+
+	}
+	return aggErr.GetError()
 }
