@@ -20,7 +20,7 @@ func main() {
 		})
 	})
 
-	r.GET("/bye", func(c *gin.Context) {
+	r.POST("/bye", func(c *gin.Context) {
 		log.Println("Fuck you")
 		c.JSON(http.StatusOK, gin.H{
 			"message": "bye, bye",
