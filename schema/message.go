@@ -1,6 +1,6 @@
 package schema
 
-type Message struct {
+type Message[T any] struct {
 	Version string `json:"version"`
-	Payload []byte `json:"payload"`
+	Payload T      `json:"payload"`
 }

@@ -6,11 +6,13 @@ type NotificationType string
 
 const (
 	Hello NotificationType = "hello"
+	Bye   NotificationType = "bye"
 )
 
 var (
 	notificationMap = map[string]NotificationType{
 		"hello": Hello,
+		"bye":   Bye,
 	}
 )
 
@@ -20,6 +22,6 @@ func ParseString(str string) (NotificationType, bool) {
 }
 
 type Notification struct {
-	Type   string
+	Type   NotificationType
 	Tokens map[string]string
 }
