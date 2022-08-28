@@ -13,6 +13,7 @@ func main() {
 		log.Panic("could not load configuration")
 	}
 
+	//todo create wrapper for routes
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -34,7 +35,6 @@ func main() {
 		if err := c.ShouldBindJSON(&msg); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
-		log.Printf("Hello message received form %s, and says %s\n", msg.Name, msg.Notification)
 
 		c.JSON(http.StatusOK, gin.H{"status": "received"})
 	})
@@ -46,7 +46,6 @@ func main() {
 		if err := c.ShouldBindJSON(&msg); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
-		log.Printf("Hello2 message received form %s, and says %s\n", msg.Name, msg.Notification)
 
 		c.JSON(http.StatusOK, gin.H{"status": "received"})
 	})

@@ -4,5 +4,4 @@ activemq:
   password: "pass"
 
 subscription: notifications
-array:
-  -
+array: []

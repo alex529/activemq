@@ -39,6 +39,7 @@ func (n WebhookNotifier) Notify(notification schema.Notification) error {
 }
 
 func sendNotification(uri, payload string) error {
+	//todo retries
 	resp, err := http.Post(
 		uri,
 		"application/json",

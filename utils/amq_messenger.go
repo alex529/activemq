@@ -84,7 +84,7 @@ func (m *AmqMessenger[T]) Process(processor func(schema.Message[T], error) error
 	defer sub.Unsubscribe()
 
 	for {
-		payload := <-sub.C
+		payload := <-sub.C //todo optimize
 		var msg schema.Message[T]
 		if err := json.Unmarshal(payload.Body, &msg); err != nil {
 			log.Printf("Error unmarshalling err: %v\nmsg: %s", err, payload.Body)

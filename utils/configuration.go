@@ -37,26 +37,33 @@ func areAllInitialized(cfg interface{}) error {
 	reflectValue := reflect.ValueOf(cfg)
 
 	aggErr := NewAggregateError()
-	for i := 0; i < reflectType.NumField(); i++ {
+	if reflectType.Kind() == reflect.Array || reflectType.Kind() == reflect.Slice {
+		typeName := reflectType.Name()
+		valueValue := reflectValue.Interface()
+		if reflect.TypeOf(valueValue).Elem().Kind() != reflect.String {
+			return errors.New("Only arrays of strings are allowed")
+		}
+		val := reflect.ValueOf(valueValue)
+		if val.Len() == 0 || val.Index(0).Interface() == "" {
+			return fmt.Errorf("%s was not set", typeName)
+		}
+	}
+	for i := 0; reflectType.Kind() == reflect.Struct && i < reflectType.NumField(); i++ {
 		typeName := reflectType.Field(i).Name
 		valueValue := reflectValue.Field(i).Interface()
 
-		switch reflectValue.Field(i).Kind() {
+		tmp := reflectValue.Field(i).Kind()
+		switch tmp {
 		case reflect.String:
 			if valueValue == "" {
 				aggErr.Add(fmt.Errorf("%s was not set", typeName))
 			}
 		case reflect.Struct:
 			aggErr.Add(areAllInitialized(valueValue))
+		case reflect.Map:
+			aggErr.Add(areAllInitialized(valueValue))
 		case reflect.Slice:
-			if reflect.TypeOf(valueValue).Elem().Kind() != reflect.String {
-				aggErr.Add(errors.New("Only arrays of strings are allowed"))
-				break
-			}
-			array := valueValue.([]string)
-			if len(array) == 0 || array[0] == "" {
-				aggErr.Add(fmt.Errorf("%s was not set", typeName))
-			}
+			aggErr.Add(areAllInitialized(valueValue))
 		default:
 			return errors.New("Only structs/arrays of strings are allowed")
 		}
