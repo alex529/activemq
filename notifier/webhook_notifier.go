@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/alex529/activemq/schema"
@@ -50,11 +49,6 @@ func sendNotification(uri, payload string) error {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	log.Printf(string(body))
-	return nil
+	_, err = ioutil.ReadAll(resp.Body)
+	return err
 }

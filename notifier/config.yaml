@@ -7,7 +7,7 @@ template_links:
 
 webhooks:
   hello:
-    - 127.0.0.1:8080/hello
-    - 127.0.0.1:8080/hello2
+    - http://gin-server:8080/hello
+    - http://gin-server:8080/hello2
   bye:
-    - 127.0.0.1:8080/bye
+    - http://gin-server:8080/bye

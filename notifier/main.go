@@ -21,15 +21,19 @@ func main() {
 	dist := MakeDistributor(cfg, tProvider)
 
 	for true {
-		dist.NotifyAll(schema.Notification{
+		if err := dist.NotifyAll(schema.Notification{
 			Type:   schema.Hello,
-			Tokens: map[string]string{"name": "alex"},
-		})
-		time.Sleep(300 * time.Millisecond)
-		dist.NotifyAll(schema.Notification{
+			Tokens: map[string]string{"name": "alex1"},
+		}); err != nil {
+			log.Printf("Error hello: %v", err)
+		}
+		time.Sleep(1 * time.Second)
+		if err := dist.NotifyAll(schema.Notification{
 			Type:   schema.Bye,
 			Tokens: map[string]string{"name": "alex"},
-		})
-		time.Sleep(300 * time.Millisecond)
+		}); err != nil {
+			log.Printf("Error bye: %v", err)
+		}
+		time.Sleep(1 * time.Second)
 	}
 }

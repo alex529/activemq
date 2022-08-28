@@ -34,9 +34,5 @@ func (n EmailNotifier) Notify(notification schema.Notification) error {
 }
 
 func sendEmail(to, subject, msg string) {
-	log.Printf(
-		`wannabe email sender
-		to: %s
-		subject: %s
-		msg: %s`, to, subject, msg)
+	log.Printf("Email sender to: %s subject: %s msg: \n%s\n", to, subject, msg)
 }
