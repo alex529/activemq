@@ -19,3 +19,11 @@ func (p MessageFactory[T]) Make(payload T) schema.Message[T] {
 		Payload: payload,
 	}
 }
+
+func (p MessageFactory[T]) MakeWithConsumer(consumers []schema.ConsumerType, payload T) schema.Message[T] {
+	return schema.Message[T]{
+		Consumers: consumers,
+		Version:   p.version,
+		Payload:   payload,
+	}
+}
