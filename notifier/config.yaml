@@ -1,0 +1,13 @@
+template_links:
+  emails:
+    - hello
+  webhooks:
+    - hello
+    - bye
+
+webhooks:
+  hello:
+    - 127.0.0.1:8080/hello
+    - 127.0.0.1:8080/hello2
+  bye:
+    - 127.0.0.1:8080/bye
