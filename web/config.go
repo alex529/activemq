@@ -4,7 +4,7 @@ import "github.com/alex529/activemq/utils"
 
 type Config struct {
 	Server struct {
-		Port string `yaml:"port", envconfig:"PORT"`
+		Port string `yaml:"port" envconfig:"PORT"`
 	} `yaml:"server"`
 }
 

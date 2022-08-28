@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
-	"time"
 
 	"github.com/alex529/activemq/schema"
+	"github.com/alex529/activemq/utils"
 )
 
 func main() {
@@ -12,7 +12,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//todo subscribe
 
 	tProvider, err := MakeTemplateProvider("./templates/email", "./templates/webhook") //todo
 	if err != nil {
@@ -20,20 +19,23 @@ func main() {
 	}
 	dist := MakeDistributor(cfg, tProvider)
 
-	for true {
-		if err := dist.NotifyAll(schema.Notification{
-			Type:   schema.Hello,
-			Tokens: map[string]string{"name": "alex1"},
-		}); err != nil {
-			log.Printf("Error hello: %v", err)
+	var p utils.Processor[schema.Notification] = utils.NewAmqMessenger[schema.Notification](
+		utils.AmqConfig{
+			Endpoint: cfg.ActiveMQ.Endpoint,
+			User:     cfg.ActiveMQ.Username,
+			Pass:     cfg.ActiveMQ.Password,
+		},
+		cfg.Subscription,
+		utils.Anycast,
+	)
+
+	err = p.Process(func(msg schema.Message[schema.Notification], err error) error {
+		if err := dist.NotifyAll(msg.Payload); err != nil {
+			log.Fatal(err)
 		}
-		time.Sleep(1 * time.Second)
-		if err := dist.NotifyAll(schema.Notification{
-			Type:   schema.Bye,
-			Tokens: map[string]string{"name": "alex"},
-		}); err != nil {
-			log.Printf("Error bye: %v", err)
-		}
-		time.Sleep(1 * time.Second)
+		return nil
+	})
+	if err != nil {
+		log.Fatal(err)
 	}
 }

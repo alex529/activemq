@@ -1,0 +1,6 @@
+activemq:
+  endpoint: "172.21.0.2:61616"
+  username: "quarkus"
+  password: "quarkus"
+
+NotificationAddresses: notifications

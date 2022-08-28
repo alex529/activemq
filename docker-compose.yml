@@ -1,21 +1,21 @@
-version: '2'
+version: '3'
 
 networks:
   isolation-network:
     driver: bridge
 
 services:
-  # artemis:
-  #   image: quay.io/artemiscloud/activemq-artemis-broker
-  #   ports:
-  #     - "8161:8161"
-  #     - "61616:61616"
-  #     - "5672:5672"
-  #   environment:
-  #     AMQ_USER: quarkus
-  #     AMQ_PASSWORD: quarkus
-  #   networks:
-  #     - amqp-quickstart-network
+  artemis:
+    image: quay.io/artemiscloud/activemq-artemis-broker
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+      - "5672:5672"
+    environment:
+      AMQ_USER: &amq-user quarkus
+      AMQ_PASSWORD: &amq-pass quarkus
+    networks:
+      - isolation-network
 
   gin-server:
     image: cosmtrek/air
@@ -33,7 +33,28 @@ services:
     image: cosmtrek/air
     depends_on:
       - gin-server
+      - artemis
     working_dir: /app/notifier
+    environment:
+      AMQ_USER: *amq-user
+      AMQ_PASSWORD: *amq-pass
+      AMQ_ENDPOINT: artemis:61616
+      SUB_ADR: &notifications-adr notifications
+    volumes:
+      - ./:/app/
+    networks:
+      - isolation-network
+
+  publisher:
+    image: cosmtrek/air
+    depends_on:
+      - artemis
+    working_dir: /app/publisher
+    environment:
+      AMQ_USER: *amq-user
+      AMQ_PASSWORD: *amq-pass
+      AMQ_ENDPOINT: artemis:61616
+      NOTIFICATIONS_ADR: *notifications-adr
     volumes:
       - ./:/app/
     networks:
