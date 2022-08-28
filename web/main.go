@@ -8,6 +8,11 @@ import (
 )
 
 func main() {
+	cfg, err := MakeConfig("./config.yaml")
+	if err != nil {
+		log.Panic("could not load configuration")
+	}
+
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -34,5 +39,17 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"status": "received"})
 	})
 
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.POST("/hello2", func(c *gin.Context) {
+		var msg struct {
+			Name, Notification string
+		}
+		if err := c.ShouldBindJSON(&msg); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		log.Printf("Hello2 message received form %s, and says %s\n", msg.Name, msg.Notification)
+
+		c.JSON(http.StatusOK, gin.H{"status": "received"})
+	})
+
+	r.Run(":" + cfg.Server.Port)
 }
